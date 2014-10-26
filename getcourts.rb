@@ -1,4 +1,4 @@
-#!/usr/local/bin/ruby
+#!/usr/bin/ruby
 
 require_relative 'player'
 require_relative 'court_reservation'
@@ -9,7 +9,25 @@ require 'watir-webdriver'
 require 'set'
 require 'time'
 require 'yaml'
+require 'rmeetup'
 
+start_date = (Date.today + 3).to_time.to_i * 1000
+end_date = (Date.today + 4).to_time.to_i * 1000
+puts "#{start_date},#{end_date}"
+
+RMeetup::Client.api_key = "324c5b977b10602306351385ea"
+results = RMeetup::Client.fetch(:events, {
+    :time => "#{start_date},#{end_date}",
+    :member_id => 7865492,
+    :group_id => 1619561,
+    :utc_offset => -25200000
+})
+puts results.size
+results.each do |result|
+  # Do something with the result
+  puts result
+end
+exit 1
 options = {}
 OptionParser.new do |opts|
   opts.banner = "Usage: getcourts.rb [options]"

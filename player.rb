@@ -93,7 +93,10 @@ class Player
       puts "Checking for courts @ " + time
       courts = Hash.new
       for image in tbody.imgs(:title => /is Available .* from #{time}/)
-        m = /Court (\d\d) is Available .* from (.*) to/.match(image.title)
+        m = /(Center) Court is Available .* from (.*) to/.match(image.title)
+        if m == nil or m.captures.size != 2
+          m = /Court (\d\d) is Available .* from (.*) to/.match(image.title)
+        end
         if m and m.captures.size == 2
           court = m.captures[0]
           start_time = m.captures[1]
@@ -125,6 +128,7 @@ class Player
   end
 
   def getExistingReservations
+    @b.frame(:name => "mainFrame").wait_until_present
     f = @b.frame(:name => "mainFrame").frame(:name => "bottom")
     tbody = f.table.tbody
     num_previous_reservations = @reservations.size
@@ -157,12 +161,13 @@ class Player
   end
 
   def login
-    @b = Watir::Browser.new :chrome
+    @b = Watir::Browser.new :firefox
     @b.goto "http://eclubconnect.com/rci"
     @b.goto "http://eclubconnect.com/rci/default1.asp?clr=ss&h2=h2&idi=133"
+    @b.frame(:name => "CenterFrame").wait_until_present
     f = @b.frame(:name => "CenterFrame")
-    f.text_field(:name => 'Mtxtlogin').set @username
-    f.text_field(:name => 'Mtxtpwd').set @password
+    f.text_field(:name => 'Mtxtlogin').when_present.set @username
+    f.text_field(:name => 'Mtxtpwd').when_present.set @password
     f.button(:name => 'cmdSubmit').click
 
     # Extract name
