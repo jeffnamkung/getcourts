@@ -133,10 +133,13 @@ class Player
     tbody = f.table.tbody
     num_previous_reservations = @reservations.size
     for image in tbody.imgs(:title => /Open Play .* for #{@name}/)
-      m = /Open Play on CT(\d\d), for #{@name}, .* scheduled at (.*)/.match(image.title)
+      m = /Open Play on CT(.*), for #{@name}, .* scheduled at (.*)/.match(image.title)
       if m and m.captures.size == 2
         court = m.captures[0]
         time = m.captures[1]
+        if court == "CC"
+          court = "Center"
+        end
 
         if not reservationExists?(court, time)
           puts @name + " has Court " + court + " @ " + time + " on " + dateStr

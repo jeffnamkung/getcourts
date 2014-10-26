@@ -27,7 +27,7 @@ results.each do |result|
   # Do something with the result
   puts result
 end
-exit 1
+
 options = {}
 OptionParser.new do |opts|
   opts.banner = "Usage: getcourts.rb [options]"
