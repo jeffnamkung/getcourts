@@ -11,22 +11,27 @@ require 'time'
 require 'yaml'
 require 'rmeetup'
 
-start_date = (Date.today + 3).to_time.to_i * 1000
-end_date = (Date.today + 4).to_time.to_i * 1000
-puts "#{start_date},#{end_date}"
-
-RMeetup::Client.api_key = "324c5b977b10602306351385ea"
-results = RMeetup::Client.fetch(:events, {
-    :time => "#{start_date},#{end_date}",
-    :member_id => 7865492,
-    :group_id => 1619561,
-    :utc_offset => -25200000
-})
-puts results.size
-results.each do |result|
-  # Do something with the result
-  puts result
-end
+#start_date = (Date.today + 3).to_time.to_i * 1000
+#end_date = (Date.today + 4).to_time.to_i * 1000
+#puts "#{start_date},#{end_date}"
+#
+#RMeetup::Client.api_key = "324c5b977b10602306351385ea"
+#results = RMeetup::Client.fetch(:events, {
+#    :time => "#{start_date},#{end_date}",
+#    :member_id => 7865492,
+#    :group_id => 1619561,
+#})
+#puts results.size
+#results.each do |result|
+#  # Do something with the result
+#  puts result.id
+#  puts result.name
+#  puts result.description
+#  puts result.how_to_find_us
+#  puts "# attendees: " + result.yes_rsvp_count.to_s
+#  puts Time.at(result.time/1000).strftime("%m/%d/%Y %I:%M:%p")
+#  # puts "Time: " + result.time
+#end
 
 options = {}
 OptionParser.new do |opts|

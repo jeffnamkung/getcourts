@@ -177,7 +177,13 @@ class Player
     @name = @b.frame(:name => "header").table().table.font(:color => "white").text
 
     # pick date
-    date_str = @date.strftime('%m/%d/%Y')
+    date_str = "%d/%d/%d" % [@date.month, @date.day, @date.year]
+    f = @b.frame(:name => "mainFrame").frame(:name => "middle")
+    form = f.form(:id => "frmSch")
+    if @date.month > Date.today.month
+      next_month_link = "/application/esch_ematch/testcal.asp?month=%d&year=%d" % [@date.month, @date.year]
+      form.a(:href => next_month_link).click
+    end
     f = @b.frame(:name => "mainFrame").frame(:name => "middle")
     form = f.form(:id => "frmSch")
     form.a(:href => "javascript:setDate('" + date_str + "')").click
