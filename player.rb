@@ -164,7 +164,9 @@ class Player
   end
 
   def login
-    @b = Watir::Browser.new :firefox
+    # @b = Watir::Browser.new :phantomjs
+    # @b = Watir::Browser.new :firefox
+    @b = Watir::Browser.new :chrome
     @b.goto "http://eclubconnect.com/rci"
     @b.goto "http://eclubconnect.com/rci/default1.asp?clr=ss&h2=h2&idi=133"
     @b.frame(:name => "CenterFrame").wait_until_present

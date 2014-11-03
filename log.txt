@@ -1,26 +1,14 @@
-# Logfile created on 2014-10-21 21:57:41 -0700 by logger.rb/41954
-D, [2014-10-25T22:40:36.785433 #3136] DEBUG -- : Unable to reserve Court 08 @ 05:30PM on 10/28/2014 for Jeff Namkung
-D, [2014-10-25T22:40:36.802615 #3136] DEBUG -- : Unable to reserve Court 08 @ 05:30PM on 10/28/2014 for Andrew Young
-D, [2014-10-25T22:40:36.802699 #3136] DEBUG -- : Unable to reserve Court 08 @ 05:30PM on 10/28/2014 for Will Wang
-D, [2014-10-25T22:40:36.802820 #3136] DEBUG -- : Unable to reserve Court 08 @ 05:30PM on 10/28/2014 for Dave Liu
-D, [2014-10-25T22:40:36.803120 #3136] DEBUG -- : Unable to reserve Court 08 @ 05:30PM on 10/28/2014 for Jeff Namkung
-D, [2014-10-25T22:40:36.803256 #3136] DEBUG -- : Unable to reserve Court 08 @ 05:30PM on 10/28/2014 for Andrew Young
-D, [2014-10-25T22:40:36.803311 #3136] DEBUG -- : Unable to reserve Court 08 @ 05:30PM on 10/28/2014 for Will Wang
-D, [2014-10-25T22:40:36.803538 #3136] DEBUG -- : Unable to reserve Court 08 @ 05:30PM on 10/28/2014 for Dave Liu
-D, [2014-10-25T22:40:36.803897 #3136] DEBUG -- : Unable to reserve Court 08 @ 05:30PM on 10/28/2014 for Jeff Namkung
-D, [2014-10-25T22:40:36.804036 #3136] DEBUG -- : Unable to reserve Court 08 @ 05:30PM on 10/28/2014 for Andrew Young
-D, [2014-10-25T22:40:36.804158 #3136] DEBUG -- : Unable to reserve Court 08 @ 05:30PM on 10/28/2014 for Will Wang
-D, [2014-10-25T22:40:36.804290 #3136] DEBUG -- : Unable to reserve Court 08 @ 05:30PM on 10/28/2014 for Dave Liu
-D, [2014-10-25T22:40:36.804484 #3136] DEBUG -- : Unable to reserve Court 08 @ 07:00PM on 10/28/2014 for Jeff Namkung
-D, [2014-10-25T22:40:36.804568 #3136] DEBUG -- : Unable to reserve Court 08 @ 07:00PM on 10/28/2014 for Andrew Young
-D, [2014-10-25T22:40:36.804895 #3136] DEBUG -- : Unable to reserve Court 08 @ 07:00PM on 10/28/2014 for Will Wang
-D, [2014-10-25T22:40:36.805057 #3136] DEBUG -- : Unable to reserve Court 08 @ 07:00PM on 10/28/2014 for Dave Liu
-D, [2014-10-25T22:40:36.805252 #3136] DEBUG -- : Unable to reserve Court 08 @ 07:00PM on 10/28/2014 for Jeff Namkung
-D, [2014-10-25T22:40:36.805322 #3136] DEBUG -- : Unable to reserve Court 08 @ 07:00PM on 10/28/2014 for Andrew Young
-D, [2014-10-25T22:40:36.805562 #3136] DEBUG -- : Unable to reserve Court 08 @ 07:00PM on 10/28/2014 for Will Wang
-D, [2014-10-25T22:40:36.805631 #3136] DEBUG -- : Unable to reserve Court 08 @ 07:00PM on 10/28/2014 for Dave Liu
-D, [2014-10-25T22:40:36.805872 #3136] DEBUG -- : Unable to reserve Court 08 @ 07:00PM on 10/28/2014 for Jeff Namkung
-D, [2014-10-25T22:40:36.805937 #3136] DEBUG -- : Unable to reserve Court 08 @ 07:00PM on 10/28/2014 for Andrew Young
-D, [2014-10-25T22:40:36.806176 #3136] DEBUG -- : Unable to reserve Court 08 @ 07:00PM on 10/28/2014 for Will Wang
-D, [2014-10-25T22:40:36.806244 #3136] DEBUG -- : Unable to reserve Court 08 @ 07:00PM on 10/28/2014 for Dave Liu
-D, [2014-10-25T22:40:36.806326 #3136] DEBUG -- : No available courts for 9:30
+# Logfile created on 2014-11-02 20:21:18 -0800 by logger.rb/44203
+D, [2014-11-02T20:21:17.984029 #39588] DEBUG -- : Reserved Court 10 @ 07:00PM on 11/05/2014 for Jeff Namkung
+D, [2014-11-02T20:21:18.024349 #39588] DEBUG -- : Unable to reserve Court 07 @ 07:00PM on 11/05/2014 for Jeff Namkung
+D, [2014-11-02T20:21:18.027419 #39588] DEBUG -- : Unable to reserve Court 07 @ 07:00PM on 11/05/2014 for Will Wang
+D, [2014-11-02T20:21:18.035438 #39588] DEBUG -- : Unable to reserve Court 07 @ 07:00PM on 11/05/2014 for Andrew Young
+D, [2014-11-02T20:21:18.035578 #39588] DEBUG -- : Unable to reserve Court 08 @ 07:00PM on 11/05/2014 for Jeff Namkung
+D, [2014-11-02T20:21:18.035649 #39588] DEBUG -- : Unable to reserve Court 08 @ 07:00PM on 11/05/2014 for Will Wang
+D, [2014-11-02T20:21:18.035817 #39588] DEBUG -- : Unable to reserve Court 08 @ 07:00PM on 11/05/2014 for Andrew Young
+D, [2014-11-02T20:21:18.035905 #39588] DEBUG -- : Unable to reserve Court 07 @ 07:00PM on 11/05/2014 for Jeff Namkung
+D, [2014-11-02T20:21:18.035970 #39588] DEBUG -- : Unable to reserve Court 07 @ 07:00PM on 11/05/2014 for Will Wang
+D, [2014-11-02T20:21:18.036165 #39588] DEBUG -- : Unable to reserve Court 07 @ 07:00PM on 11/05/2014 for Andrew Young
+D, [2014-11-02T20:21:18.036230 #39588] DEBUG -- : Unable to reserve Court 08 @ 07:00PM on 11/05/2014 for Jeff Namkung
+D, [2014-11-02T20:21:18.036292 #39588] DEBUG -- : Unable to reserve Court 08 @ 07:00PM on 11/05/2014 for Will Wang
+D, [2014-11-02T20:21:18.036499 #39588] DEBUG -- : Unable to reserve Court 08 @ 07:00PM on 11/05/2014 for Andrew Young
