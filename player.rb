@@ -164,34 +164,40 @@ class Player
   end
 
   def login
-    # @b = Watir::Browser.new :phantomjs
-    # @b = Watir::Browser.new :firefox
-    @b = Watir::Browser.new :chrome
-    @b.goto "http://eclubconnect.com/rci"
-    @b.goto "http://eclubconnect.com/rci/default1.asp?clr=ss&h2=h2&idi=133"
-    @b.frame(:name => "CenterFrame").wait_until_present
-    f = @b.frame(:name => "CenterFrame")
-    f.text_field(:name => 'Mtxtlogin').when_present.set @username
-    f.text_field(:name => 'Mtxtpwd').when_present.set @password
-    f.button(:name => 'cmdSubmit').click
+    begin
+      # @b = Watir::Browser.new :phantomjs
+      # @b = Watir::Browser.new :firefox
+      @b = Watir::Browser.new :chrome
+      @b.goto "http://eclubconnect.com/rci"
+      @b.goto "http://eclubconnect.com/rci/default1.asp?clr=ss&h2=h2&idi=133"
+      @b.frame(:name => "CenterFrame").wait_until_present
+      f = @b.frame(:name => "CenterFrame")
+      f.text_field(:name => 'Mtxtlogin').when_present.set @username
+      f.text_field(:name => 'Mtxtpwd').when_present.set @password
+      f.button(:name => 'cmdSubmit').click
 
-    # Extract name
-    @name = @b.frame(:name => "header").table().table.font(:color => "white").text
+      # Extract name
+      @name = @b.frame(:name => "header").table().table.font(:color => "white").text
 
-    # pick date
-    date_str = "%d/%d/%d" % [@date.month, @date.day, @date.year]
-    f = @b.frame(:name => "mainFrame").frame(:name => "middle")
-    form = f.form(:id => "frmSch")
-    if @date.month > Date.today.month
-      next_month_link = "/application/esch_ematch/testcal.asp?month=%d&year=%d" % [@date.month, @date.year]
-      form.a(:href => next_month_link).click
+      # pick date
+      date_str = "%d/%d/%d" % [@date.month, @date.day, @date.year]
+      f = @b.frame(:name => "mainFrame").frame(:name => "middle")
+      form = f.form(:id => "frmSch")
+      if @date.month > Date.today.month
+        next_month_link = "/application/esch_ematch/testcal.asp?month=%d&year=%d" % [@date.month, @date.year]
+        form.a(:href => next_month_link).click
+      end
+      f = @b.frame(:name => "mainFrame").frame(:name => "middle")
+      form = f.form(:id => "frmSch")
+      form.a(:href => "javascript:setDate('" + date_str + "')").click
+
+      # find existing reservations
+      getExistingReservations
+    rescue Watir::Exception::NavigationException,
+        Watir::Exception::Error,
+        Watir::Wait::TimeoutError
+      retry
     end
-    f = @b.frame(:name => "mainFrame").frame(:name => "middle")
-    form = f.form(:id => "frmSch")
-    form.a(:href => "javascript:setDate('" + date_str + "')").click
-
-    # find existing reservations
-    getExistingReservations
   end
 
   def name

@@ -201,29 +201,32 @@ end
 me = players[0]
 availableCourts = me.getAvailableCourts()
 
-reserved_courts = ''
-unreserved_courts = ''
+available_courts = 'Available Courts: '
+
+reserved_courts = 'Reserved Courts: '
+unreserved_courts = 'Errors: '
 for court_time in court_times_by_day[player.date.wday]
   if not availableCourts.has_key?(court_time)
     result = "No available courts for " + court_time
-    unreserved_courts = unreserved_courts + result
+    unreserved_courts = unreserved_courts + "\n" + result
     puts result
     log.debug result
   else
     for court in pickBestCourt(court_tiers[player.date.wday], availableCourts[court_time])
+      available_courts = available_courts + "\n" + court.to_s
       for player in players
         if player.canMakeReservation?(court) and player.pickCourtAndTime(court)
           # reserve court
-          result = "Reserved Court " + court.court + " @ " + court.time + " on " + player.dateStr + " for " + player.name
-          reserved_courts = reserved_courts + result
+          result = "Reserved " + court.to_s + " on " + player.dateStr + " for " + player.name
+          reserved_courts = reserved_courts + "\n" + result
           puts result
           log.debug result
 
           availableCourts[court_time].delete(court)
           break
         else
-          result = "Unable to reserve Court " + court.court + " @ " + court.time + " on " + player.dateStr + " for " + player.name
-          unreserved_courts = unreserved_courts + result
+          result = "Unable to reserve " + court.to_s + " on " + player.dateStr + " for " + player.name
+          unreserved_courts = unreserved_courts + "\n" + result
           puts result
           log.debug result
         end
@@ -238,6 +241,7 @@ end
 
 date_str = "%d/%d/%d" % [me.date.month, me.date.day, me.date.year]
 subject = 'Court reservations for ' + date_str
-body = reserved_courts + unreserved_courts
+body = reserved_courts + "\n" + available_courts + "\n" + unreserved_courts
 mailer.send_plain_email 'oskarmellow@gmail.com', 'jeffnamkung@gmail.com', subject, body
+mailer.send_plain_email 'oskarmellow@gmail.com', 'dave@ironmantennis.com', subject, body
 
