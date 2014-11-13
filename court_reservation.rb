@@ -1,10 +1,10 @@
 class CourtReservation
-  def time
-    @time
-  end
+  attr_reader :time
+  attr_reader :court
 
-  def court
-    @court
+  def initialize(court, time)
+    @court = court
+    @time = time
   end
 
   def to_s
@@ -13,10 +13,5 @@ class CourtReservation
     else
       "Court " + court + " @ " + time
     end
-  end
-
-  def initialize(court, time)
-    @court = court
-    @time = time
   end
 end
