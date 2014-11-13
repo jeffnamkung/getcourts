@@ -46,13 +46,13 @@ class Player
       form.a(:href => "javascript:setDate('" + date_str + "')").click
 
       # find existing reservations
-      getExistingReservations
+      get_existing_reservations
     rescue
       retry
     end
   end
 
-  def pickCourtAndTime(reservation)
+  def pick_court_and_time(reservation)
     begin
       # pick court and time
       f = @b.frame(:name => "mainFrame").frame(:name => "bottom")
@@ -96,13 +96,13 @@ class Player
         @log.warn "Court " + reservation.court + " is not available @ " + reservation.time
       end
 
-      getExistingReservations
+      get_existing_reservations
     rescue
       retry
     end
   end
 
-  def canMakeReservation?(reservation)
+  def can_make_reservation?(reservation)
     begin
       if not @days.include?(@date.wday)
         @log.warn @name + " does not schedule on " + @date.strftime('%A') + "s"
@@ -136,8 +136,8 @@ class Player
     end
   end
 
-  def getAvailableCourts
-    begin
+  def get_available_courts
+  begin
       times = Array.new
       if @date.sunday? or @date.saturday?
         times << "09:00AM" << "10:30AM"
@@ -190,7 +190,7 @@ class Player
     end
   end
 
-  def getExistingReservations
+  def get_existing_reservations
     begin
       @b.frame(:name => "mainFrame").wait_until_present
       f = @b.frame(:name => "mainFrame").frame(:name => "bottom")
@@ -205,7 +205,7 @@ class Player
             court = "Center"
           end
 
-          if not reservationExists?(court, time)
+          if not reservation_exists?(court, time)
             @log.info @name + " has Court " + court + " @ " + time + " on " + dateStr
             @reservations << CourtReservation.new(court, time)
           end
@@ -217,7 +217,7 @@ class Player
     end
   end
 
-  def reservationExists?(court, time)
+  def reservation_exists?(court, time)
     for existingReservation in @reservations
       if existingReservation.court == court and existingReservation.time == time
         return true

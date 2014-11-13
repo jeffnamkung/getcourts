@@ -126,3 +126,35 @@ I, [2014-11-12T22:41:36.982178 #32612]  INFO -- : Will Wang has Court 23 @ 11:30
 I, [2014-11-12T22:41:53.843787 #32612]  INFO -- : Andrew Young has Court Center @ 10:30AM on 11/15/2014
 I, [2014-11-12T22:41:53.852784 #32612]  INFO -- : Andrew Young has Court Center @ 11:00AM on 11/15/2014
 I, [2014-11-12T22:41:53.860942 #32612]  INFO -- : Andrew Young has Court Center @ 11:30AM on 11/15/2014
+I, [2014-11-12T22:57:14.087545 #2507]  INFO -- : Jeff Namkung has Court 14 @ 09:00AM on 11/15/2014
+I, [2014-11-12T22:57:14.105367 #2507]  INFO -- : Jeff Namkung has Court 14 @ 09:30AM on 11/15/2014
+I, [2014-11-12T22:57:14.119424 #2507]  INFO -- : Jeff Namkung has Court 14 @ 10:00AM on 11/15/2014
+I, [2014-11-12T22:57:33.152703 #2507]  INFO -- : Will Wang has Court 23 @ 10:30AM on 11/15/2014
+I, [2014-11-12T22:57:33.163411 #2507]  INFO -- : Will Wang has Court 23 @ 11:00AM on 11/15/2014
+I, [2014-11-12T22:57:33.173976 #2507]  INFO -- : Will Wang has Court 23 @ 11:30AM on 11/15/2014
+I, [2014-11-12T22:57:52.031147 #2507]  INFO -- : Andrew Young has Court Center @ 10:30AM on 11/15/2014
+I, [2014-11-12T22:57:52.042810 #2507]  INFO -- : Andrew Young has Court Center @ 11:00AM on 11/15/2014
+I, [2014-11-12T22:57:52.053971 #2507]  INFO -- : Andrew Young has Court Center @ 11:30AM on 11/15/2014
+D, [2014-11-12T22:57:52.054201 #2507] DEBUG -- : Checking for courts @ 09:00AM
+D, [2014-11-12T22:57:56.697045 #2507] DEBUG -- : Checking for courts @ 10:30AM
+I, [2014-11-12T22:58:01.258932 #2507]  INFO -- : 11 is Available @ 10:30AM
+I, [2014-11-12T22:58:01.295094 #2507]  INFO -- : 16 is Available @ 10:30AM
+I, [2014-11-12T22:58:01.313375 #2507]  INFO -- : 17 is Available @ 10:30AM
+I, [2014-11-12T22:58:01.331842 #2507]  INFO -- : 21 is Available @ 10:30AM
+I, [2014-11-12T22:58:01.351111 #2507]  INFO -- : 22 is Available @ 10:30AM
+I, [2014-11-12T22:58:01.370045 #2507]  INFO -- : 25 is Available @ 10:30AM
+I, [2014-11-12T22:58:01.387920 #2507]  INFO -- : 26 is Available @ 10:30AM
+D, [2014-11-12T22:58:01.388032 #2507] DEBUG -- : No available courts for 09:00AM
+D, [2014-11-12T22:58:01.388101 #2507] DEBUG -- : No available courts for 09:00AM
+W, [2014-11-12T22:58:01.389175 #2507]  WARN -- : Jeff Namkung already has a court reservation that overlaps with 10:30AM
+D, [2014-11-12T22:58:01.389276 #2507] DEBUG -- : Unable to reserve Court 17 @ 10:30AM on 11/15/2014 for Jeff Namkung
+W, [2014-11-12T22:58:01.389326 #2507]  WARN -- : Will Wang already has a court reservation that overlaps with 10:30AM
+D, [2014-11-12T22:58:01.389376 #2507] DEBUG -- : Unable to reserve Court 17 @ 10:30AM on 11/15/2014 for Will Wang
+W, [2014-11-12T22:58:01.389423 #2507]  WARN -- : Andrew Young already has a court reservation that overlaps with 10:30AM
+D, [2014-11-12T22:58:01.389473 #2507] DEBUG -- : Unable to reserve Court 17 @ 10:30AM on 11/15/2014 for Andrew Young
+W, [2014-11-12T22:58:01.389725 #2507]  WARN -- : Jeff Namkung already has a court reservation that overlaps with 10:30AM
+D, [2014-11-12T22:58:01.389777 #2507] DEBUG -- : Unable to reserve Court 17 @ 10:30AM on 11/15/2014 for Jeff Namkung
+W, [2014-11-12T22:58:01.389824 #2507]  WARN -- : Will Wang already has a court reservation that overlaps with 10:30AM
+D, [2014-11-12T22:58:01.389874 #2507] DEBUG -- : Unable to reserve Court 17 @ 10:30AM on 11/15/2014 for Will Wang
+W, [2014-11-12T22:58:01.389920 #2507]  WARN -- : Andrew Young already has a court reservation that overlaps with 10:30AM
+D, [2014-11-12T22:58:01.389970 #2507] DEBUG -- : Unable to reserve Court 17 @ 10:30AM on 11/15/2014 for Andrew Young

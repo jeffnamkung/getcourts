@@ -1,4 +1,4 @@
- #!/usr/local/bin/ruby
+#!/usr/local/bin/ruby
 
 require_relative 'smtp_google_mailer'
 require_relative 'player'
@@ -44,14 +44,14 @@ court_times_by_day[4] = Array["05:30PM", "05:30PM", "07:00PM", "07:00PM"]
 court_times_by_day[5] = Array[]
 court_times_by_day[6] = Array["09:00AM", "09:00AM", "10:30AM", "10:30AM"]
 
-def rankCourts(courts)
+def rank_courts(courts)
   rankings = Hash.new
   i = 0
-  for court in courts
+  courts.each do |court|
     rankings[i] = court
     i += 1
   end
-  return rankings
+  rankings
 end
 
 court_tiers = Array.new
@@ -63,83 +63,74 @@ court_tiers[4] = Array["14", "15", "12", "13", "09", "10", "07", "08", "Center",
 court_tiers[5] = Array["19", "20"]
 court_tiers[6] = Array["Center", "18", "19", "17", "14", "15", "12", "13", "09", "10", "07", "08"]
 
-def pickBestCourt(rankedCourts, availableCourts)
-  rankedOpenCourts = Array.new
-  for court in rankedCourts
-    for open_court in availableCourts
+def pick_best_court(ranked_courts, available_courts)
+  ranked_open_courts = Array.new
+  for court in ranked_courts
+    for open_court in available_courts
       if open_court.court == court
-        rankedOpenCourts << open_court
+        ranked_open_courts << open_court
         break
       end
     end
   end
-  return rankedOpenCourts
+  ranked_open_courts
 end
 
-def pickPlayer(players)
+def pick_player(players)
   players[0]
 end
 
 for player in players
-  player.login()
+  player.login
 end
 
 me = players[0]
-availableCourts = me.getAvailableCourts()
+available_courts = me.get_available_courts
 
 courts = []
-available_courts = 'Available Courts: '
-reserved_courts = 'Reserved Courts: '
-unreserved_courts = 'Errors: '
-for court_time in court_times_by_day[player.date.wday]
-  if not availableCourts.has_key?(court_time)
-    result = "No available courts for " + court_time
-    unreserved_courts = unreserved_courts + "\n" + result
-    log.debug result
-  else
-    for court in pickBestCourt(court_tiers[player.date.wday], availableCourts[court_time])
+for court_time in court_times_by_day[me.date.wday]
+  if available_courts.has_key?(court_time)
+    for court in pick_best_court(court_tiers[me.date.wday], available_courts[court_time])
       available_courts = available_courts + "\n" + court.to_s
       for player in players
-        if player.canMakeReservation?(court) and player.pickCourtAndTime(court)
+        if player.can_make_reservation?(court) and player.pick_court_and_time(court)
           # reserve court
           courts << court
           log.info "Reserved " + court.to_s + " on " + player.dateStr + " for " + player.name
-          reserved_courts = reserved_courts + "\n" + result
-          log.debug result
 
-          availableCourts[court_time].delete(court)
+          available_courts[court_time].delete(court)
           break
         else
-          result = "Unable to reserve " + court.to_s + " on " + player.dateStr + " for " + player.name
-          unreserved_courts = unreserved_courts + "\n" + result
-          log.debug result
+          log.debug "Unable to reserve " + court.to_s + " on " + player.dateStr + " for " + player.name
         end
       end
     end
+  else
+    log.debug "No available courts for " + court_time
   end
 end
 
 for player in players
-  player.logout()
+  player.logout
 end
 
-date_str = "%d/%d/%d" % [me.date.month, me.date.day, me.date.year]
-subject = 'Court reservations for ' + date_str
-body = reserved_courts + "\n" + available_courts + "\n" + unreserved_courts
-
-if not courts.empty?
+courts_as_string = ''
+if courts.any?
   meetup_conf = YAML::load_file(options[:meetup])
   meetup_updater = MeetupUpdater.new(meetup_conf[:apikey],
                                      meetup_conf[:member_id],
                                      meetup_conf[:group_id],
                                      meetup_conf[:venue_id])
-  courts_as_string = ''
   courts.each { |court| courts_as_string += court.to_s + " " }
   meetup_updater.update_meetup(me.date, courts_as_string)
 end
 
 smtp_info =
     begin
+      date_str = "%d/%d/%d" % [me.date.month, me.date.day, me.date.year]
+      subject = 'Court reservations for ' + date_str
+      body = courts_as_string + "\n" + available_courts + "\n" + unreserved_courts
+
       mailer = SMTPGoogleMailer.new(YAML.load_file(options[:smtp]))
       body += "\n-------- DEBUG LOG ---------\n" +  File.read(options[:logfile])
       mailer.send_plain_email('oskarmellow@gmail.com', 'jeffnamkung@gmail.com', subject, body)
