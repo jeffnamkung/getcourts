@@ -31,15 +31,14 @@ module RMeetup
 end
 
 class MeetupUpdater
-  def initialize(api_key, member_id, group_id, venue_id)
+  def initialize(meetup_conf)
     @client = RMeetup::Client.new do |config|
-      config.api_key = api_key
+      config.api_key = meetup_conf[:api_key]
     end
-
     @event_options = {
-      :member_id => member_id,
-      :group_id => group_id,
-      :venue.id => venue_id
+      :member_id => meetup_conf[:member_id],
+      :group_id => meetup_conf[:group_id],
+      :venue_id => meetup_conf[:venue_id]
     }
   end
 
@@ -48,7 +47,7 @@ class MeetupUpdater
 
     @client.fetch(:events, @event_options).each do |result|
       # Do something with the result
-      client.post(:event, result.event['id'], {
+      @client.post(:event, result.event['id'], {
           :how_to_find_us =>
               result.event.key?('how_to_find_us') ?
                   courts + ". " + result.how_to_find_us : courts

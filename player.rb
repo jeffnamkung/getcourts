@@ -6,12 +6,12 @@ class Player
   attr_reader :name
 
   def initialize(attributes, log)
-    @username = attributes["username"]
-    @password = attributes["password"]
+    @username = attributes[:username]
+    @password = attributes[:password]
     @date = Date::today + 3
     @reservations = Array.new
     @days = Set.new
-    for day in attributes["days_available"]
+    for day in attributes[:days_available]
       @days.add Date.parse(day).wday
     end
     @log = log

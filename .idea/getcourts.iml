@@ -1,31 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module type="RUBY_MODULE" version="4">
-  <component name="CompassSettings">
-    <option name="compassSupportEnabled" value="true" />
-  </component>
   <component name="ModuleRunConfigurationManager">
-    <configuration default="false" name="getcourts" type="RubyRunConfigurationType" factoryName="Ruby">
-      <module name="getcourts" />
-      <RUBY_RUN_CONFIG NAME="RUBY_ARGS" VALUE="-e $stdout.sync=true;$stderr.sync=true;load($0=ARGV.shift)" />
-      <RUBY_RUN_CONFIG NAME="WORK DIR" VALUE="$MODULE_DIR$" />
-      <RUBY_RUN_CONFIG NAME="SHOULD_USE_SDK" VALUE="false" />
-      <RUBY_RUN_CONFIG NAME="ALTERN_SDK_NAME" VALUE="" />
-      <RUBY_RUN_CONFIG NAME="myPassParentEnvs" VALUE="true" />
-      <envs />
-      <EXTENSION ID="BundlerRunConfigurationExtension" bundleExecEnabled="false" />
-      <EXTENSION ID="JRubyRunConfigurationExtension" NailgunExecEnabled="false" />
-      <EXTENSION ID="RubyCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" track_test_folders="true" runner="rcov">
-        <COVERAGE_PATTERN ENABLED="true">
-          <PATTERN REGEXPS="/.rvm/" INCLUDED="false" />
-        </COVERAGE_PATTERN>
-      </EXTENSION>
-      <EXTENSION ID="org.jetbrains.plugins.ruby.motion.run.MotionSimulatorRunExtension" />
-      <RUBY_RUN_CONFIG NAME="SCRIPT_PATH" VALUE="$MODULE_DIR$/getcourts.rb" />
-      <RUBY_RUN_CONFIG NAME="SCRIPT_ARGS" VALUE="--userfile $USER_HOME$/users.yaml  --logfile log.txt --smtp $USER_HOME$/smtp.yaml  --meetup $USER_HOME$/meetup.yaml" />
-      <RunnerSettings RunnerId="RubyRunner" />
-      <ConfigurationWrapper RunnerId="RubyRunner" />
-      <method />
-    </configuration>
     <configuration default="false" name="IRB console: getcourts" type="IrbRunConfigurationType" factoryName="IRB console" temporary="true">
       <module name="getcourts" />
       <IRB_RUN_CONFIG NAME="RUBY_ARGS" VALUE="-e $stdout.sync=true;$stderr.sync=true;load($0=ARGV.shift)" />
@@ -45,6 +20,28 @@
       <IRB_RUN_CONFIG NAME="SCRIPT_PATH" VALUE="/usr/bin/irb" />
       <IRB_RUN_CONFIG NAME="SCRIPT_ARGS" VALUE="--prompt simple" />
       <IRB_RUN_CONFIG NAME="IS_RAILS_CONSOLE" VALUE="false" />
+      <RunnerSettings RunnerId="RubyRunner" />
+      <ConfigurationWrapper RunnerId="RubyRunner" />
+      <method />
+    </configuration>
+    <configuration default="false" name="getcourts" type="RubyRunConfigurationType" factoryName="Ruby">
+      <module name="getcourts" />
+      <RUBY_RUN_CONFIG NAME="RUBY_ARGS" VALUE="-e $stdout.sync=true;$stderr.sync=true;load($0=ARGV.shift)" />
+      <RUBY_RUN_CONFIG NAME="WORK DIR" VALUE="$MODULE_DIR$" />
+      <RUBY_RUN_CONFIG NAME="SHOULD_USE_SDK" VALUE="false" />
+      <RUBY_RUN_CONFIG NAME="ALTERN_SDK_NAME" VALUE="" />
+      <RUBY_RUN_CONFIG NAME="myPassParentEnvs" VALUE="true" />
+      <envs />
+      <EXTENSION ID="BundlerRunConfigurationExtension" bundleExecEnabled="false" />
+      <EXTENSION ID="JRubyRunConfigurationExtension" NailgunExecEnabled="false" />
+      <EXTENSION ID="RubyCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" track_test_folders="true" runner="rcov">
+        <COVERAGE_PATTERN ENABLED="true">
+          <PATTERN REGEXPS="/.rvm/" INCLUDED="false" />
+        </COVERAGE_PATTERN>
+      </EXTENSION>
+      <EXTENSION ID="org.jetbrains.plugins.ruby.motion.run.MotionSimulatorRunExtension" />
+      <RUBY_RUN_CONFIG NAME="SCRIPT_PATH" VALUE="$MODULE_DIR$/getcourts.rb" />
+      <RUBY_RUN_CONFIG NAME="SCRIPT_ARGS" VALUE="--conf $USER_HOME$/conf.yaml  --logfile log.txt" />
       <RunnerSettings RunnerId="RubyRunner" />
       <ConfigurationWrapper RunnerId="RubyRunner" />
       <method />
@@ -113,6 +110,7 @@
     <orderEntry type="library" scope="PROVIDED" name="ffi (v1.9.6, ruby-2.1.2-p95) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="http (v0.6.2, ruby-2.1.2-p95) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="http_parser.rb (v0.6.0, ruby-2.1.2-p95) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="json (v1.8.1, ruby-2.1.2-p95) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="multi_json (v1.10.1, ruby-2.1.2-p95) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rMeetup (v2.0.1, ruby-2.1.2-p95) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rubyzip (v1.1.6, ruby-2.1.2-p95) [gem]" level="application" />
@@ -122,4 +120,3 @@
     <orderEntry type="library" scope="PROVIDED" name="websocket (v1.2.1, ruby-2.1.2-p95) [gem]" level="application" />
   </component>
 </module>
-

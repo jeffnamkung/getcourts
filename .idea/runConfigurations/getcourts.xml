@@ -16,7 +16,7 @@
     </EXTENSION>
     <EXTENSION ID="org.jetbrains.plugins.ruby.motion.run.MotionSimulatorRunExtension" />
     <RUBY_RUN_CONFIG NAME="SCRIPT_PATH" VALUE="$MODULE_DIR$/getcourts.rb" />
-    <RUBY_RUN_CONFIG NAME="SCRIPT_ARGS" VALUE="--userfile $USER_HOME$/users.yaml  --logfile log.txt --smtp $USER_HOME$/smtp.yaml  --meetup $USER_HOME$/meetup.yaml" />
+    <RUBY_RUN_CONFIG NAME="SCRIPT_ARGS" VALUE="--conf $USER_HOME$/conf.yaml  --logfile log.txt" />
     <RunnerSettings RunnerId="RubyRunner" />
     <ConfigurationWrapper RunnerId="RubyRunner" />
     <method />

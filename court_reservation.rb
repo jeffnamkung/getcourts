@@ -8,10 +8,10 @@ class CourtReservation
   end
 
   def to_s
-    if court == "Center"
-      "Center Court @ " + time
+    if court == 'Center'
+      'Center Court @ ' + time
     else
-      "Court " + court + " @ " + time
+      'Court ' + court + ' @ ' + time
     end
   end
 end

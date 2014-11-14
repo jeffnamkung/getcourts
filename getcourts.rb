@@ -17,19 +17,15 @@ require 'tlsmail'
 options = {}
 OptionParser.new do |opts|
   opts.banner = "Usage: getcourts.rb [options]"
-
-  opts.on('-u', '--userfile userfile', 'users file') { |v| options[:userfile] = v }
+  opts.on('-u', '--conf configuration', 'configuration file') { |v| options[:conf] = v }
   opts.on('-l', '--logfile logfile', 'log file') { |v| options[:logfile] = v }
-  opts.on('-s', '--smtp smtpconfigfile', 'smtp configuration file') { |v| options[:smtp] = v }
-  opts.on('-m', '--meetup meetupconf', 'meetup configuration file') { |v| options[:meetup] = v }
 end.parse!
 
-cnf = YAML::load_file(options[:userfile])
-
+cnf = YAML::load_file(options[:conf])
 log = Logger.new(options[:logfile], 'daily')
 
 players = []
-for user in cnf['users']
+for user in cnf[:users]
   players << Player.new(user, log)
 end
 
@@ -115,11 +111,7 @@ end
 
 courts_as_string = ''
 if courts.any?
-  meetup_conf = YAML::load_file(options[:meetup])
-  meetup_updater = MeetupUpdater.new(meetup_conf[:apikey],
-                                     meetup_conf[:member_id],
-                                     meetup_conf[:group_id],
-                                     meetup_conf[:venue_id])
+  meetup_updater = MeetupUpdater.new(cnf[:meetup])
   courts.each { |court| courts_as_string += court.to_s + " " }
   meetup_updater.update_meetup(me.date, courts_as_string)
 end
@@ -128,11 +120,12 @@ smtp_info =
     begin
       date_str = "%d/%d/%d" % [me.date.month, me.date.day, me.date.year]
       subject = 'Court reservations for ' + date_str
-
-      mailer = SMTPGoogleMailer.new(YAML.load_file(options[:smtp]))
-      body = courts_as_string
-      body += "\n-------- DEBUG LOG ---------\n" +  File.read(options[:logfile])
-      mailer.send_plain_email('oskarmellow@gmail.com', 'jeffnamkung@gmail.com', subject, courts_as_string)
+      body = courts_as_string + "\n-------- DEBUG LOG ---------\n" +
+          File.read(options[:logfile])
+      mailer = SMTPGoogleMailer.new(cnf[:smtp])
+      mailer.send_plain_email('oskarmellow@gmail.com',
+                              'jeffnamkung@gmail.com',
+                              subject, body)
     rescue
       $stderr.puts "Could not find SMTP info"
     end
