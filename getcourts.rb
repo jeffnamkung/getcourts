@@ -91,7 +91,6 @@ courts = []
 for court_time in court_times_by_day[me.date.wday]
   if available_courts.has_key?(court_time)
     for court in pick_best_court(court_tiers[me.date.wday], available_courts[court_time])
-      available_courts = available_courts + "\n" + court.to_s
       for player in players
         if player.can_make_reservation?(court) and player.pick_court_and_time(court)
           # reserve court
@@ -129,11 +128,11 @@ smtp_info =
     begin
       date_str = "%d/%d/%d" % [me.date.month, me.date.day, me.date.year]
       subject = 'Court reservations for ' + date_str
-      body = courts_as_string + "\n" + available_courts + "\n" + unreserved_courts
 
       mailer = SMTPGoogleMailer.new(YAML.load_file(options[:smtp]))
+      body = courts_as_string
       body += "\n-------- DEBUG LOG ---------\n" +  File.read(options[:logfile])
-      mailer.send_plain_email('oskarmellow@gmail.com', 'jeffnamkung@gmail.com', subject, body)
+      mailer.send_plain_email('oskarmellow@gmail.com', 'jeffnamkung@gmail.com', subject, courts_as_string)
     rescue
       $stderr.puts "Could not find SMTP info"
     end
