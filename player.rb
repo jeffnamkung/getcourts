@@ -73,10 +73,12 @@ class Player
       # pick court and time
       court, court_name = pick_court(reservation)
 
+      court_time_string = court_name + " @ " + reservation.start_time.strftime('%I:%M%p')
+      court_time_string_user = court_time_string + " on " + dateStr + " for " + name
       if court.nil?
-        @log.warn "Court " + court_name + " is not available @ " + reservation.start_time
+        @log.warn court_time_string + " is not available"
       else
-        @log.debug "About to schedule " + court_name + " @ " + reservation.start_time + " on " + dateStr + " for " + name
+        @log.debug "About to schedule " + court_time_string_user
         court.click
         f = @b.frame(:name => "mainFrame")
         players = f.text_fields(:name => "txtPname")
@@ -99,11 +101,11 @@ class Player
           end
         end
         reservation.make_reservation
-        log.info "Reserved " + court.to_s + " on " + player.dateStr + " for " + player.name
+        log.info "Reserved " + court_time_string_user
       end
     rescue Exception => exception
-      @log.warning exception.message
-      @log.warning exception.backtrace.inspect
+      @log.warn exception.message
+      @log.warn exception.backtrace.inspect
       logout
       login
       retry
@@ -115,18 +117,16 @@ class Player
     tbody = f.table.tbody
 
     reservation.court_preference.delete_if do |preferred_court|
-      unless court.exists?
-        if preferred_court == "Center"
-          court_name = "Center Court"
-        else
-          court_name= "Court %d" % preferred_court
-        end
-        court = tbody.img(:title => /#{court_name} is Available for Block Schedule from #{reservation.start_time} to .*/)
-        unless court.exists?
-          court = tbody.img(:title => /#{court_name} is Available at #{reservation.start_time}/)
-        end
-        return court, court_name
+      if preferred_court == "Center"
+        court_name = "Center Court"
+      else
+        court_name= "Court %d" % preferred_court
       end
+      court = tbody.img(:title => /#{court_name} is Available for Block Schedule from #{reservation.start_time} to .*/)
+      unless court.exists?
+        court = tbody.img(:title => /#{court_name} is Available at #{reservation.start_time}/)
+      end
+      return court, court_name
     end
   end
 
@@ -177,8 +177,8 @@ class Player
       end
       @reservations.size > num_previous_reservations
     rescue Exception => exception
-      @log.warning exception.message
-      @log.warning exception.backtrace.inspect
+      @log.warn exception.message
+      @log.warn exception.backtrace.inspect
       logout
       login
       retry

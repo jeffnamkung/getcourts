@@ -36,7 +36,7 @@ while DailyReservation.not_done? and Player.have_players?
   log.info("Finding " + reservation.to_s)
   player = Player.find_available_player(reservation.start_time)
   if player.nil?
-    log.warning "No one available to reserve a court @ " + reservation.start_time
+    log.warn "No one available to reserve a court @ " + reservation.start_time
   else
     player.reserve(reservation)
   end
@@ -52,16 +52,17 @@ smtp_info = begin
   mailer.send_plain_email('oskarmellow@gmail.com',
                           'jeffnamkung@gmail.com',
                           subject, body)
-rescue
+rescue Exception => exception
+  log.warn exception.message
+  log.warn exception.backtrace.inspect
   $stderr.puts "Could not find SMTP info"
 end
 
 meetup_updater = MeetupUpdater.new(cnf[:meetup])
 meetup_updater.update_meetup(Player.admin.date,
                              Player.get_existing_reservations)
-Player.logout
 rescue Exception => exception
-  Player.logout
-  puts exception.message
-  puts exception.backtrace.inspect
+  log.warn exception.message
+  log.warn exception.backtrace.inspect
 end
+Player.logout
