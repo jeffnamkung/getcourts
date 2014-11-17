@@ -31,36 +31,37 @@ puts DailyReservation.to_s
 Player.initialize(cnf[:users], log)
 
 begin
-while DailyReservation.not_done? and Player.have_players?
-  reservation = DailyReservation.next_reservation
-  log.info("Finding " + reservation.to_s)
-  player = Player.find_available_player(reservation.start_time)
-  if player.nil?
-    log.warn "No one available to reserve a court @ " + reservation.start_time
-  else
-    player.reserve(reservation)
+  while DailyReservation.not_done? and Player.have_players?
+    reservation = DailyReservation.next_reservation
+    log.info("Finding " + reservation.to_s)
+    player = Player.find_available_player(reservation.start_time)
+    if player.nil?
+      log.warn "No one available to reserve a court @ " + reservation.start_time
+    else
+      player.reserve(reservation)
+    end
+    reservation.make_reservation
   end
-end
 
-me = Player.admin
-smtp_info = begin
-  date_str = "%d/%d/%d" % [me.date.month, me.date.day, me.date.year]
-  subject = 'Court reservations for ' + date_str
-  body = courts_as_string + "\n-------- DEBUG LOG ---------\n" +
-      File.read(options[:logfile])
-  mailer = SMTPGoogleMailer.new(cnf[:smtp])
-  mailer.send_plain_email('oskarmellow@gmail.com',
-                          'jeffnamkung@gmail.com',
-                          subject, body)
-rescue Exception => exception
-  log.warn exception.message
-  log.warn exception.backtrace.inspect
-  $stderr.puts "Could not find SMTP info"
-end
+  me = Player.admin
+  smtp_info = begin
+    date_str = "%d/%d/%d" % [me.date.month, me.date.day, me.date.year]
+    subject = 'Court reservations for ' + date_str
+    body = "\n-------- DEBUG LOG ---------\n" +
+        File.read(options[:logfile])
+    mailer = SMTPGoogleMailer.new(cnf[:smtp])
+    mailer.send_plain_email('oskarmellow@gmail.com',
+                            'jeffnamkung@gmail.com',
+                            subject, body)
+  rescue Exception => exception
+    log.warn exception.message
+    log.warn exception.backtrace.inspect
+    $stderr.puts "Could not find SMTP info"
+  end
 
-meetup_updater = MeetupUpdater.new(cnf[:meetup])
-meetup_updater.update_meetup(Player.admin.date,
-                             Player.get_existing_reservations)
+  meetup_updater = MeetupUpdater.new(cnf[:meetup])
+  meetup_updater.update_meetup(Player.admin.date,
+                               Player.get_existing_reservations)
 rescue Exception => exception
   log.warn exception.message
   log.warn exception.backtrace.inspect

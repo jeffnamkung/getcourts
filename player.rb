@@ -6,11 +6,17 @@ class Player
   attr_reader :date
   attr_reader :name
   attr_reader :reservations
+  attr_reader :days
 
   @@players = Array.new
   def Player.initialize(configurations, log)
     configurations.each do |configuration|
-      @@players << Player.new(configuration, log)
+      player = Player.new(configuration, log)
+      if player.days.include?(player.date.wday)
+        @@players << player
+      else
+        log.warn player.name + " does not schedule on " + player.date.strftime('%A') + "s"
+      end
     end
   end
 
@@ -29,6 +35,7 @@ class Player
   def Player.get_existing_reservations
     courts_as_string = []
     @@players.each do |player|
+      player.get_existing_reservations
       player.reservations.each do |reservation|
         courts_as_string << reservation.to_s
         break
@@ -73,11 +80,11 @@ class Player
       # pick court and time
       court, court_name = pick_court(reservation)
 
-      court_time_string = court_name + " @ " + reservation.start_time.strftime('%I:%M%p')
-      court_time_string_user = court_time_string + " on " + dateStr + " for " + name
-      if court.nil?
-        @log.warn court_time_string + " is not available"
+      if court.nil? or not court.exists?
+        @log.warn "No courts available for " + reservation.to_s
       else
+        court_time_string = court_name + " @ " + reservation.start_time.strftime('%I:%M%p')
+        court_time_string_user = court_time_string + " on " + dateStr + " for " + name
         @log.debug "About to schedule " + court_time_string_user
         court.click
         f = @b.frame(:name => "mainFrame")
@@ -100,8 +107,7 @@ class Player
             @b.alert.ok
           end
         end
-        reservation.make_reservation
-        log.info "Reserved " + court_time_string_user
+        @log.info "Reserved " + court_time_string_user
       end
     rescue Exception => exception
       @log.warn exception.message
@@ -116,17 +122,24 @@ class Player
     f = @b.frame(:name => "mainFrame").frame(:name => "bottom")
     tbody = f.table.tbody
 
-    reservation.court_preference.delete_if do |preferred_court|
+    time = reservation.start_time.strftime('%I:%M%p')
+    reservation.court_preference.each do |preferred_court|
       if preferred_court == "Center"
         court_name = "Center Court"
       else
-        court_name= "Court %d" % preferred_court
+        court_name= "Court " + preferred_court
       end
-      court = tbody.img(:title => /#{court_name} is Available for Block Schedule from #{reservation.start_time} to .*/)
+      court = tbody.img(:title => /#{court_name} is Available for Block Schedule from #{time} to .*/)
       unless court.exists?
-        court = tbody.img(:title => /#{court_name} is Available at #{reservation.start_time}/)
+        court = tbody.img(:title => /#{court_name} is Available at #{time}/)
       end
-      return court, court_name
+      reservation.court_preference.delete(preferred_court)
+      reservation.court_preference.compact
+      if court.exists?
+        return court, court_name
+      else
+        @log.warn court_name + " @ " + time + " is not available."
+      end
     end
   end
 
@@ -135,11 +148,7 @@ class Player
   end
 
   def can_make_reservation?(start_time)
-    if not @days.include?(@date.wday)
-      @log.warn @name + " does not schedule on " + @date.strftime('%A') + "s"
-      return false
-    end
-    if @reservations.size >= 6
+    if @reservations.size >= 2
       @log.warn @name + " already has 2 court reservations, which is the max per day"
       return false
     end
@@ -187,7 +196,10 @@ class Player
 
   def reservation_exists?(court, time)
     for existingReservation in @reservations
-      if existingReservation.court == court and existingReservation.start_time == time
+      if existingReservation.court == court and
+          (existingReservation.start_time == time or
+              existingReservation.start_time + 30 * 60 == time or
+              existingReservation.start_time + 60 * 60 == time)
         return true
       end
     end
