@@ -8,7 +8,7 @@ class DailyReservation
   def initialize(time_slot)
     @start_time = Time.parse(time_slot[:start_time])
     @num_courts = time_slot[:num_courts]
-    @court_preference  = Array["Center", "14", "13", "15", "12", "07", "09", "19", "18", "20", "21", "23", "24", "25", "10", "08", "26", "16", "11", "17", "22", "17", "27"]
+    @court_preference = Array["Center", "14", "13", "15", "12", "07", "09", "19", "18", "20", "21", "23", "24", "25", "10", "08", "26", "16", "11", "17", "22", "17", "27"]
     if time_slot.key?(:court)
       time_slot[:court].each do |court|
         @court_preference.delete_if { |ranked_court| ranked_court == court }
@@ -26,6 +26,7 @@ class DailyReservation
 
   @@date = Date::today + 3
   @@reservations_by_time = {}
+
   def DailyReservation.initialize(configuration)
     configuration[@@date.strftime("%A").to_sym].each do |time_slot|
       reservation = DailyReservation.new(time_slot)
@@ -42,7 +43,7 @@ class DailyReservation
   end
 
   def to_s
-    to_string =  "%d courts @ " % @num_courts
+    to_string = "%d courts @ " % @num_courts
     to_string += @start_time.strftime('%I:%M%p')
     to_string += ' Preferring ' + @court_preference.join(", ") unless @court_preference.nil?
     to_string

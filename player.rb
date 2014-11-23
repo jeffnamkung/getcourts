@@ -9,6 +9,7 @@ class Player
   attr_reader :days
 
   @@players = Array.new
+
   def Player.initialize(configurations, log)
     configurations.each do |configuration|
       player = Player.new(configuration, log)
@@ -76,45 +77,37 @@ class Player
   end
 
   def reserve(reservation)
-    begin
-      # pick court and time
-      court, court_name = pick_court(reservation)
+    # pick court and time
+    court, court_name = pick_court(reservation)
 
-      if court.nil? or not court.exists?
-        @log.warn "No courts available for " + reservation.to_s
-      else
-        court_time_string = court_name + " @ " + reservation.start_time.strftime('%I:%M%p')
-        court_time_string_user = court_time_string + " on " + dateStr + " for " + name
-        @log.debug "About to schedule " + court_time_string_user
-        court.click
-        f = @b.frame(:name => "mainFrame")
-        players = f.text_fields(:name => "txtPname")
-        players[1].set 'Will Fill'
-        players[2].click
+    if court.nil? or not court.exists?
+      @log.warn "No courts available for " + reservation.to_s
+    else
+      court_time_string = court_name + " @ " + reservation.start_time.strftime('%I:%M%p')
+      court_time_string_user = court_time_string + " on " + dateStr + " for " + name
+      @log.debug "About to schedule " + court_time_string_user
+      court.click
+      f = @b.frame(:name => "mainFrame")
+      players = f.text_fields(:name => "txtPname")
+      players[1].set 'Will Fill'
+      players[2].click
 
-        @b.alert.ok
-        f.img(:name => 'schedule').click
-        cancel = @b.frame(:name => "mainFrame").img(:name => "cancel")
-        if cancel.exists?
-          error = @b.frame(:name => "mainFrame").font(:color => "blue")
-          if error.exists?
-            @log.warn "Unable to schedule court for reason: " + error.text
-          else
-            @log.warn "Unable to schedule court for unknown reason"
-          end
-          cancel.click
-          if @b.alert.exists?
-            @b.alert.ok
-          end
+      @b.alert.ok
+      f.img(:name => 'schedule').click
+      cancel = @b.frame(:name => "mainFrame").img(:name => "cancel")
+      if cancel.exists?
+        error = @b.frame(:name => "mainFrame").font(:color => "blue")
+        if error.exists?
+          @log.warn "Unable to schedule court for reason: " + error.text
+        else
+          @log.warn "Unable to schedule court for unknown reason"
         end
-        @log.info "Reserved " + court_time_string_user
+        cancel.click
+        if @b.alert.exists?
+          @b.alert.ok
+        end
       end
-    rescue Exception => exception
-      @log.warn exception.message
-      @log.warn exception.backtrace.inspect
-      logout
-      login
-      retry
+      @log.info "Reserved " + court_time_string_user
     end
   end
 
@@ -163,35 +156,27 @@ class Player
   end
 
   def get_existing_reservations
-    begin
-      @b.frame(:name => "mainFrame").wait_until_present
-      f = @b.frame(:name => "mainFrame").frame(:name => "bottom")
-      tbody = f.table.tbody
-      num_previous_reservations = @reservations.size
-      for image in tbody.imgs(:title => /Open Play .* for #{@name}/)
-        m = /Open Play on CT(.*), for #{@name}, .* scheduled at (.*)/.match(image.title)
-        if m and m.captures.size == 2
-          court = m.captures[0]
-          time = m.captures[1]
-          if court == "CC"
-            court = "Center"
-          end
-          start_time = Time.parse(time)
+    @b.frame(:name => "mainFrame").wait_until_present
+    f = @b.frame(:name => "mainFrame").frame(:name => "bottom")
+    tbody = f.table.tbody
+    num_previous_reservations = @reservations.size
+    for image in tbody.imgs(:title => /Open Play .* for #{@name}/)
+      m = /Open Play on CT(.*), for #{@name}, .* scheduled at (.*)/.match(image.title)
+      if m and m.captures.size == 2
+        court = m.captures[0]
+        time = m.captures[1]
+        if court == "CC"
+          court = "Center"
+        end
+        start_time = Time.parse(time)
 
-          if not reservation_exists?(court, start_time)
-            @log.info @name + " has Court " + court + " @ " + time + " on " + dateStr
-            @reservations << CourtReservation.new(court, start_time)
-          end
+        if not reservation_exists?(court, start_time)
+          @log.info @name + " has Court " + court + " @ " + time + " on " + dateStr
+          @reservations << CourtReservation.new(court, start_time)
         end
       end
-      @reservations.size > num_previous_reservations
-    rescue Exception => exception
-      @log.warn exception.message
-      @log.warn exception.backtrace.inspect
-      logout
-      login
-      retry
     end
+    @reservations.size > num_previous_reservations
   end
 
   def reservation_exists?(court, time)
@@ -212,34 +197,30 @@ class Player
 
   private
   def login
-    begin
-      # @b = Watir::Browser.new :phantomjs
-      # @b = Watir::Browser.new :firefox
-      @b = Watir::Browser.new :chrome
-      @b.goto "http://eclubconnect.com/rci"
-      @b.goto "http://eclubconnect.com/rci/default1.asp?clr=ss&h2=h2&idi=133"
-      @b.frame(:name => "CenterFrame").wait_until_present
-      f = @b.frame(:name => "CenterFrame")
-      f.text_field(:name => 'Mtxtlogin').when_present.set @username
-      f.text_field(:name => 'Mtxtpwd').when_present.set @password
-      f.button(:name => 'cmdSubmit').click
+    # @b = Watir::Browser.new :phantomjs
+    # @b = Watir::Browser.new :firefox
+    @b = Watir::Browser.new :chrome
+    @b.goto "http://eclubconnect.com/rci"
+    @b.goto "http://eclubconnect.com/rci/default1.asp?clr=ss&h2=h2&idi=133"
+    @b.frame(:name => "CenterFrame").wait_until_present
+    f = @b.frame(:name => "CenterFrame")
+    f.text_field(:name => 'Mtxtlogin').when_present.set @username
+    f.text_field(:name => 'Mtxtpwd').when_present.set @password
+    f.button(:name => 'cmdSubmit').click
 
-      # Extract name
-      @name = @b.frame(:name => "header").table().table.font(:color => "white").text
+    # Extract name
+    @name = @b.frame(:name => "header").table().table.font(:color => "white").text
 
-      # pick date
-      date_str = "%d/%d/%d" % [@date.month, @date.day, @date.year]
-      f = @b.frame(:name => "mainFrame").frame(:name => "middle")
-      form = f.form(:id => "frmSch")
-      if @date.month > Date.today.month
-        next_month_link = "/application/esch_ematch/testcal.asp?month=%d&year=%d" % [@date.month, @date.year]
-        form.a(:href => next_month_link).click
-      end
-      f = @b.frame(:name => "mainFrame").frame(:name => "middle")
-      form = f.form(:id => "frmSch")
-      form.a(:href => "javascript:setDate('" + date_str + "')").click
-    rescue
-      retry
+    # pick date
+    date_str = "%d/%d/%d" % [@date.month, @date.day, @date.year]
+    f = @b.frame(:name => "mainFrame").frame(:name => "middle")
+    form = f.form(:id => "frmSch")
+    if @date.month > Date.today.month
+      next_month_link = "/application/esch_ematch/testcal.asp?month=%d&year=%d" % [@date.month, @date.year]
+      form.a(:href => next_month_link).click
     end
+    f = @b.frame(:name => "mainFrame").frame(:name => "middle")
+    form = f.form(:id => "frmSch")
+    form.a(:href => "javascript:setDate('" + date_str + "')").click
   end
 end

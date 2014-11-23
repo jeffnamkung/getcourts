@@ -5,6 +5,7 @@ class CourtReservation
   attr_reader :court
 
   BLOCK_TIME = 90 * 60
+
   def initialize(court, start_time)
     @court = court
     @start_time = start_time
