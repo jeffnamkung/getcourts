@@ -42,17 +42,33 @@ class MeetupUpdater
     }
   end
 
-  def update_meetup(date, courts)
+  def update_meetup(date, courts_by_time)
     @event_options[:time] = "%d,%d" % [date.to_time.to_i * 1000, (date + 1).to_time.to_i * 1000]
 
     @client.fetch(:events, @event_options).each do |result|
       # Do something with the result
       @client.post(:event, result.event['id'], {
-          :how_to_find_us =>
-              result.event.key?('how_to_find_us') ?
-                  courts + ". " + result.how_to_find_us : courts
+          :how_to_find_us => how_to_find_us(courts_by_time)
       })
       break
     end
+  end
+
+  private
+
+  def how_to_find_us(courts_by_time)
+    slots = []
+    courts_by_time.sort_by{|time,courts| time}.each do |time,courts|
+      courts_as_string = []
+      courts.each do |court|
+        if court == 'Center'
+          courts_as_string << 'CC'
+        else
+          courts_as_string << 'CT' + court
+        end
+      end
+      slots << courts_as_string.join(',') + '@' + time.strftime('%I:%M%p')
+    end
+    slots.join('. ')
   end
 end

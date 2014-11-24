@@ -1,7 +1,7 @@
 #!/usr/local/bin/ruby
 
 require_relative 'smtp_google_mailer'
-require_relative 'player'
+require_relative 'player_pool'
 require_relative 'court_reservation'
 require_relative 'meetup_updater'
 require_relative 'daily_reservation'
@@ -28,13 +28,20 @@ log = Logger.new(options[:logfile], 'daily')
 DailyReservation.initialize(cnf[:daily_reservations])
 puts DailyReservation.to_s
 
-Player.initialize(cnf[:users], log)
+player_pool = PlayerPool.new(cnf[:users], log)
+me = player_pool.admin
+me.setup_mail(cnf[:smtp], options[:logfile])
+me.send_mail('Logging In')
+player_pool.login
+me.send_mail('Done Logging -> Getting Existing Reservations')
+player_pool.get_existing_reservations
+me.send_mail('Done Getting Existing Reservations -> Reserving Courts')
 
 begin
-  while DailyReservation.not_done? and Player.have_players?
+  while DailyReservation.not_done? and player_pool.have_players?
     reservation = DailyReservation.next_reservation
     log.info("Finding " + reservation.to_s)
-    player = Player.find_available_player(reservation.start_time)
+    player = player_pool.find_available_player(reservation.start_time)
     if player.nil?
       log.warn "No one available to reserve a court @ " + reservation.start_time
     else
@@ -42,28 +49,22 @@ begin
     end
     reservation.make_reservation
   end
-
-  me = Player.admin
-  smtp_info = begin
-    date_str = "%d/%d/%d" % [me.date.month, me.date.day, me.date.year]
-    subject = 'Court reservations for ' + date_str
-    body = "\n-------- DEBUG LOG ---------\n" +
-        File.read(options[:logfile])
-    mailer = SMTPGoogleMailer.new(cnf[:smtp])
-    mailer.send_plain_email('oskarmellow@gmail.com',
-                            'jeffnamkung@gmail.com',
-                            subject, body)
-  rescue Exception => exception
-    log.warn exception.message
-    log.warn exception.backtrace.inspect
-    $stderr.puts "Could not find SMTP info"
-  end
-
-  meetup_updater = MeetupUpdater.new(cnf[:meetup])
-  meetup_updater.update_meetup(Player.admin.date,
-                               Player.get_existing_reservations)
 rescue Exception => exception
   log.warn exception.message
   log.warn exception.backtrace.inspect
 end
-Player.logout
+
+me.send_mail('Done Reserving Courts -> Updating Meetup')
+
+begin
+  meetup_updater = MeetupUpdater.new(cnf[:meetup])
+  meetup_updater.update_meetup(player_pool.admin.date,
+                               player_pool.get_existing_reservations)
+
+  me.send_mail('Done Updating Meetup -> Logging out')
+rescue Exception => exception
+  log.warn exception.message
+  log.warn exception.backtrace.inspect
+end
+player_pool.logout
+me.send_mail('Done')

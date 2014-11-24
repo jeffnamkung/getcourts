@@ -8,57 +8,6 @@ class Player
   attr_reader :reservations
   attr_reader :days
 
-  @@players = Array.new
-
-  def Player.initialize(configurations, log)
-    configurations.each do |configuration|
-      player = Player.new(configuration, log)
-      if player.days.include?(player.date.wday)
-        @@players << player
-      else
-        log.warn player.name + " does not schedule on " + player.date.strftime('%A') + "s"
-      end
-    end
-  end
-
-  def Player.players
-    @@players
-  end
-
-  def Player.have_players?
-    not @@players.empty?
-  end
-
-  def Player.admin
-    @@players[0]
-  end
-
-  def Player.get_existing_reservations
-    courts_as_string = []
-    @@players.each do |player|
-      player.get_existing_reservations
-      player.reservations.each do |reservation|
-        courts_as_string << reservation.to_s
-        break
-      end
-    end
-    courts_as_string.join(". ")
-  end
-
-  def Player.logout
-    @@players.each do |player|
-      player.logout
-    end
-  end
-
-  def Player.find_available_player(start_time)
-    @@players.each do |player|
-      if player.can_make_reservation?(start_time)
-        return player
-      end
-    end
-  end
-
   def initialize(attributes, log)
     @username = attributes[:username]
     @password = attributes[:password]
@@ -69,11 +18,6 @@ class Player
       @days.add Date.parse(day).wday
     end
     @log = log
-
-    # login
-    login
-    # find existing reservations
-    get_existing_reservations
   end
 
   def reserve(reservation)
@@ -195,32 +139,65 @@ class Player
     @date.strftime('%m/%d/%Y')
   end
 
-  private
-  def login
-    # @b = Watir::Browser.new :phantomjs
-    # @b = Watir::Browser.new :firefox
-    @b = Watir::Browser.new :chrome
-    @b.goto "http://eclubconnect.com/rci"
-    @b.goto "http://eclubconnect.com/rci/default1.asp?clr=ss&h2=h2&idi=133"
-    @b.frame(:name => "CenterFrame").wait_until_present
-    f = @b.frame(:name => "CenterFrame")
-    f.text_field(:name => 'Mtxtlogin').when_present.set @username
-    f.text_field(:name => 'Mtxtpwd').when_present.set @password
-    f.button(:name => 'cmdSubmit').click
+  def setup_mail(smtp_conf, log_file)
+    @mailer = SMTPGoogleMailer.new(smtp_conf)
+    @log_file = log_file
+  end
 
-    # Extract name
-    @name = @b.frame(:name => "header").table().table.font(:color => "white").text
-
-    # pick date
-    date_str = "%d/%d/%d" % [@date.month, @date.day, @date.year]
-    f = @b.frame(:name => "mainFrame").frame(:name => "middle")
-    form = f.form(:id => "frmSch")
-    if @date.month > Date.today.month
-      next_month_link = "/application/esch_ematch/testcal.asp?month=%d&year=%d" % [@date.month, @date.year]
-      form.a(:href => next_month_link).click
+  def send_mail(body)
+    begin
+      date_str = "%d/%d/%d" % [@date.month, @date.day, @date.year]
+      subject = 'Court reservations for ' + date_str
+      body += "\n-------- DEBUG LOG ---------\n" + File.read(@log_file)
+      @mailer.send_plain_email('oskarmellow@gmail.com',
+                               'jeffnamkung@gmail.com',
+                               subject, body)
+    rescue Exception => exception
+      @log.warn exception.message
+      @log.warn exception.backtrace.inspect
+      $stderr.puts "Could not find SMTP info"
     end
-    f = @b.frame(:name => "mainFrame").frame(:name => "middle")
-    form = f.form(:id => "frmSch")
-    form.a(:href => "javascript:setDate('" + date_str + "')").click
+  end
+
+  def login
+    begin
+      num_retries = 0
+      # @b = Watir::Browser.new :phantomjs
+      # @b = Watir::Browser.new :firefox
+      @b = Watir::Browser.new :chrome
+      @b.goto "http://eclubconnect.com/rci"
+      @b.goto "http://eclubconnect.com/rci/default1.asp?clr=ss&h2=h2&idi=133"
+      @b.frame(:name => "CenterFrame").wait_until_present
+      f = @b.frame(:name => "CenterFrame")
+      f.text_field(:name => 'Mtxtlogin').when_present.set @username
+      f.text_field(:name => 'Mtxtpwd').when_present.set @password
+      f.button(:name => 'cmdSubmit').click
+
+      # Extract name
+      @name = @b.frame(:name => "header").table.table.font(:color => "white").text
+
+      # pick date
+      date_str = "%d/%d/%d" % [@date.month, @date.day, @date.year]
+      f = @b.frame(:name => "mainFrame").frame(:name => "middle")
+      form = f.form(:id => "frmSch")
+      if @date.month > Date.today.month
+        next_month_link = "/application/esch_ematch/testcal.asp?month=%d&year=%d" % [@date.month, @date.year]
+        form.a(:href => next_month_link).click
+      end
+      f = @b.frame(:name => "mainFrame").frame(:name => "middle")
+      form = f.form(:id => "frmSch")
+      form.a(:href => "javascript:setDate('" + date_str + "')").click
+      true
+    rescue Exception => exception
+      @log.warn exception.message
+      @log.warn exception.backtrace.inspect
+      @b.close
+      num_retries += 1
+      if num_retries < 3
+        retry
+      else
+        false
+      end
+    end
   end
 end
