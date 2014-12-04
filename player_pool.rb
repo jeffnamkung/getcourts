@@ -30,27 +30,12 @@ class PlayerPool
     courts_by_time
   end
 
-  def login
-    @players.delete_if { |player| not player.login }
-  end
-
-  def logout
-    @players.each do |player|
-      player.logout
-    end
-  end
-
-  def find_available_player(start_time)
-    @players.each do |player|
-      if player.can_make_reservation?(start_time)
-        return player
-      end
-    end
-  end
-
   def fill_reservations
-    while DailyReservation.not_done? and have_players?
+    while have_players?
       reservation = DailyReservation.next_reservation
+      if reservation.nil?
+        break
+      end
       Log.info("Finding " + reservation.to_s)
       @players.each do |player|
         if player.reserve_court(reservation)
@@ -59,6 +44,13 @@ class PlayerPool
           end
         end
       end
+
+      if reservation.filled?
+        Log.info("Filled " + reservation.to_s)
+      else
+        Log.warn("Unable to fill " + reservation.to_s)
+      end
+      DailyReservation.remove(reservation)
     end
   end
 end

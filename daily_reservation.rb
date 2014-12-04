@@ -39,15 +39,11 @@ class DailyReservation
   end
 
   def filled?
-    @reserved_courts.size == @num_courts
+    @reserved_courts.size >= @num_courts
   end
 
   @@date = nil
   @@reservations_by_time = {}
-
-  def DailyReservation.remove(reservation)
-    @@reservations_by_time.delete(reservation.start_time)
-  end
 
   def DailyReservation.initialize(configuration, date)
     @@date = date
@@ -59,17 +55,15 @@ class DailyReservation
     end
   end
 
-  def DailyReservation.not_done?
-    @@reservations_by_time.values.each do |reservation|
-      return false unless reservation.filled?
-    end
-    return true
+  def DailyReservation.remove(reservation)
+    @@reservations_by_time.delete(reservation.start_time)
   end
 
   def DailyReservation.next_reservation
     @@reservations_by_time.values.each do |reservation|
       return reservation unless reservation.filled?
     end
+    return nil
   end
 
   def to_s

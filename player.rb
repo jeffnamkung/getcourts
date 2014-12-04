@@ -119,10 +119,6 @@ class Player
     end
   end
 
-  def dateStr
-    @date.strftime('%m/%d/%Y')
-  end
-
   def login
     begin
       num_retries = 0
