@@ -1,3 +1,4 @@
+require_relative 'court'
 require 'time'
 
 class CourtReservation
@@ -7,7 +8,7 @@ class CourtReservation
   BLOCK_TIME = 90 * 60
 
   def initialize(court, start_time)
-    @court = court
+    @court = Court.new(court)
     @start_time = start_time
     @end_time = start_time + BLOCK_TIME
   end
@@ -20,10 +21,6 @@ class CourtReservation
 
   def to_s
     time = @start_time.strftime('%I:%M%p')
-    if @court == 'Center'
-      'Center Court @ ' + time
-    else
-      'Court ' + @court + ' @ ' + time
-    end
+    @court.long_name + ' @ ' + time
   end
 end

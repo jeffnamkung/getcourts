@@ -47,6 +47,8 @@ class MeetupUpdater
 
     @client.fetch(:events, @event_options).each do |result|
       # Do something with the result
+      find_us = how_to_find_us(courts_by_time)
+      puts find_us
       @client.post(:event, result.event['id'], {
           :how_to_find_us => how_to_find_us(courts_by_time)
       })
@@ -57,18 +59,10 @@ class MeetupUpdater
   private
 
   def how_to_find_us(courts_by_time)
-    slots = []
-    courts_by_time.sort_by{|time,courts| time}.each do |time,courts|
-      courts_as_string = []
-      courts.each do |court|
-        if court == 'Center'
-          courts_as_string << 'CC'
-        else
-          courts_as_string << 'CT' + court
-        end
-      end
-      slots << courts_as_string.join(',') + '@' + time.strftime('%I:%M%p')
-    end
-    slots.join('. ')
+    courts_by_time.sort.map { |time, courts|
+      courts.map { |court|
+        court.short_name
+      }.join(',') + '@' + time.strftime('%I:%M%p')
+    }.join('. ')
   end
 end
