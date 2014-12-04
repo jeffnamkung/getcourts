@@ -2,7 +2,6 @@
 
 require_relative 'smtp_google_mailer'
 require_relative 'player_pool'
-require_relative 'court_reservation'
 require_relative 'meetup_updater'
 require_relative 'daily_reservation'
 require_relative 'log'
