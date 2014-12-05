@@ -36,7 +36,7 @@ mailer.send_mail('Done Reserving Courts -> Updating Meetup')
 
 begin
   meetup_updater = MeetupUpdater.new(cnf[:meetup])
-  meetup_updater.update_meetup(date, player_pool.get_existing_reservations)
+  meetup_updater.update_meetup(date, DailyReservation.get_existing_reservations)
 
   mailer.send_mail('Done Updating Meetup -> Logging out')
 rescue Exception => exception

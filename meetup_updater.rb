@@ -1,3 +1,5 @@
+require_relative 'log'
+
 require 'pp'
 require 'rmeetup'
 
@@ -48,9 +50,9 @@ class MeetupUpdater
     @client.fetch(:events, @event_options).each do |result|
       # Do something with the result
       find_us = how_to_find_us(courts_by_time)
-      puts find_us
+      Log.info find_us
       @client.post(:event, result.event['id'], {
-          :how_to_find_us => how_to_find_us(courts_by_time)
+          :how_to_find_us => find_us
       })
       break
     end

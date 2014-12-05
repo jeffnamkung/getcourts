@@ -1,5 +1,4 @@
 require_relative 'court'
-require_relative 'log'
 
 require 'set'
 require 'time'
@@ -8,6 +7,7 @@ class DailyReservation
   attr_reader :start_time
   attr_accessor :num_courts
   attr_reader :court_preference
+  attr_reader :reserved_courts
 
   BLOCK_TIME = 90 * 60
 
@@ -42,6 +42,13 @@ class DailyReservation
     @reserved_courts.size >= @num_courts
   end
 
+  def to_s
+    to_string = "%d courts @ " % @num_courts
+    to_string += @start_time.strftime('%I:%M%p')
+    to_string += ' Preferring ' + @court_preference.map{|court| court.short_name}.join(", ") unless @court_preference.nil?
+    to_string
+  end
+
   @@date = nil
   @@reservations_by_time = {}
 
@@ -55,22 +62,18 @@ class DailyReservation
     end
   end
 
-  def DailyReservation.remove(reservation)
-    @@reservations_by_time.delete(reservation.start_time)
-  end
-
-  def DailyReservation.next_reservation
-    @@reservations_by_time.values.each do |reservation|
-      return reservation unless reservation.filled?
+  def DailyReservation.get_existing_reservations
+    courts_by_time = Hash.new {|h,k| h[k]=[]}
+    @@reservations_by_time.each do |time, reservation|
+      reservation.reserved_courts.each do |court|
+        courts_by_time[time] << court
+      end
     end
-    return nil
+    courts_by_time
   end
 
-  def to_s
-    to_string = "%d courts @ " % @num_courts
-    to_string += @start_time.strftime('%I:%M%p')
-    to_string += ' Preferring ' + @court_preference.map{|court| court.short_name}.join(", ") unless @court_preference.nil?
-    to_string
+  def DailyReservation.reservations
+    @@reservations_by_time.values
   end
 
   def DailyReservation.to_s

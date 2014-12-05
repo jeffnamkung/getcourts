@@ -12,6 +12,8 @@ class Player
     @password = attributes[:password]
     @date = date
     @days = Set.new
+    @existing_reservations = Array.new
+    @num_reservations = 0
     for day in attributes[:days_available]
       @days.add Date.parse(day).wday
     end
@@ -22,6 +24,7 @@ class Player
       login
 
       get_existing_reservations(reservation)
+      return false unless can_schedule?(reservation)
 
       if reservation.filled?
         logout
@@ -33,7 +36,7 @@ class Player
       if select_time(reservation.start_time)
         reservation.court_preference.each do |court|
           if select_court(court)
-            reservation.reserve_court(court)
+            reserve(reservation, court)
             logout
             return true
           end
@@ -101,6 +104,23 @@ class Player
     @b.close
   end
 
+  def reserve(reservation, court)
+    reservation.reserve_court(court)
+    @existing_reservations << reservation
+  end
+
+  def can_schedule?(reservation)
+    if @num_reservations >= 2
+      return false
+    end
+    @existing_reservations.each do |existing_reservation|
+      if existing_reservation.overlaps?(reservation.start_time)
+        return false
+      end
+    end
+    true
+  end
+
   def get_existing_reservations(reservation)
     tbody = bottom_frame.table.tbody
     for image in tbody.imgs(:title => /Open Play .* for #{@name}/)
@@ -110,10 +130,10 @@ class Player
         time = m.captures[1]
         start_time = Time.parse(time)
 
+        @num_reservations += 1
         if reservation.start_time == start_time
-          if reservation.reserve_court(court)
-            Log.info @name + " already has " + court.long_name + " @ " + time
-          end
+          reserve(reservation, court)
+          Log.info @name + " already has " + court.long_name + " @ " + time
         end
       end
     end

@@ -19,29 +19,15 @@ class PlayerPool
     not @players.empty?
   end
 
-  def get_existing_reservations
-    courts_by_time = Hash.new {|h,k| h[k]=[]}
-    @players.each do |player|
-      player.get_existing_reservations
-      player.reservations.each do |reservation|
-        courts_by_time[reservation.start_time] << reservation.court
-      end
-    end
-    courts_by_time
-  end
-
   def fill_reservations
-    while have_players?
-      reservation = DailyReservation.next_reservation
-      if reservation.nil?
-        break
-      end
+    DailyReservation.reservations.each do |reservation|
       Log.info("Finding " + reservation.to_s)
       @players.each do |player|
-        if player.reserve_court(reservation)
-          if reservation.filled?
-            break
-          end
+        if reservation.filled?
+          break
+        end
+        if player.can_schedule?(reservation)
+          player.reserve_court(reservation)
         end
       end
 
@@ -50,7 +36,6 @@ class PlayerPool
       else
         Log.warn("Unable to fill " + reservation.to_s)
       end
-      DailyReservation.remove(reservation)
     end
   end
 end
