@@ -1,57 +1,40 @@
 require_relative 'player'
 
 class PlayerPool
-  def initialize(config, log)
+  def initialize(config, date)
     @players = []
 
     config.each do |player_config|
-      player = Player.new(player_config, log)
+      player = Player.new(player_config, date)
 
       if player.days.include?(player.date.wday)
         @players << player
       else
-        log.warn player.username + " does not schedule on " + player.date.strftime('%A') + "s"
+        Log.warn player.username + " does not schedule on " + player.date.strftime('%A') + "s"
       end
     end
-  end
-
-  def players
-    @players
   end
 
   def have_players?
     not @players.empty?
   end
 
-  def admin
-    @players[0]
-  end
-
-  def get_existing_reservations
-    courts_by_time = Hash.new {|h,k| h[k]=[]}
-    @players.each do |player|
-      player.get_existing_reservations
-      player.reservations.each do |reservation|
-        courts_by_time[reservation.start_time] << reservation.court
+  def fill_reservations
+    DailyReservation.reservations.each do |reservation|
+      Log.info("Finding " + reservation.to_s)
+      @players.each do |player|
+        if reservation.filled?
+          break
+        end
+        if player.can_schedule?(reservation)
+          player.reserve_court(reservation)
+        end
       end
-    end
-    courts_by_time
-  end
 
-  def login
-    @players.delete_if { |player| not player.login }
-  end
-
-  def logout
-    @players.each do |player|
-      player.logout
-    end
-  end
-
-  def find_available_player(start_time)
-    @players.each do |player|
-      if player.can_make_reservation?(start_time)
-        return player
+      if reservation.filled?
+        Log.info("Filled " + reservation.to_s)
+      else
+        Log.warn("Unable to fill " + reservation.to_s)
       end
     end
   end

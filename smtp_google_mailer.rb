@@ -1,6 +1,18 @@
+require_relative 'log'
+
 class SMTPGoogleMailer
-  def initialize(smtp_info)
+  def initialize(smtp_info, date)
     @smtp_info = smtp_info
+    @date = date
+  end
+
+  def send_mail(body)
+    date_str = "%d/%d/%d" % [@date.month, @date.day, @date.year]
+    subject = 'Court reservations for ' + date_str
+    body += "\n-------- DEBUG LOG ---------\n" + File.read(Log.log_file)
+    send_plain_email('oskarmellow@gmail.com',
+                     'jeffnamkung@gmail.com',
+                     subject, body)
   end
 
   def send_plain_email from, to, subject, body
