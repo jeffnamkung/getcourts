@@ -10,10 +10,12 @@ class Player
   def initialize(attributes, date)
     @username = attributes[:username]
     @password = attributes[:password]
+    @partner = attributes[:partner]
     @date = date
     @days = Set.new
     @existing_reservations = Array.new
-    @num_reservations = 0
+    @reserved_times = Set.new
+    @name = ''
     for day in attributes[:days_available]
       @days.add Date.parse(day).wday
     end
@@ -21,13 +23,14 @@ class Player
 
   def reserve_court(reservation)
     begin
-      login
-
-      get_existing_reservations(reservation)
-      return false unless can_schedule?(reservation)
+      if get_existing_reservations(reservation)
+        return true
+      end
+      if not can_schedule?(reservation)
+        return false
+      end
 
       if reservation.filled?
-        logout
         return true
       end
 
@@ -37,18 +40,16 @@ class Player
         reservation.court_preference.each do |court|
           if select_court(court)
             reserve(reservation, court)
-            logout
+            Log.info('Reserved court ' + court.short_name + ' @ ' + reservation.start_time.strftime('%I:%M%p') + ' for ' + @name)
             return true
           end
         end
       end
 
-      logout
       false
     rescue Exception => exception
       Log.warn exception.message
       Log.warn exception.backtrace.inspect
-      logout
     end
   end
 
@@ -66,8 +67,10 @@ class Player
 
   def pick_base_court
     tbody = bottom_frame.table.tbody
-    court = tbody.img(:title => /Center Court is Available at 06:00AM/)
-    court.click
+    court = tbody.img(:title => /Court 27 is Available at 06:00AM/)
+    if court
+      court.click
+    end
   end
 
   def select_time(start_time)
@@ -88,10 +91,10 @@ class Player
 
   def schedule_court
     players = main_frame.text_fields(:name => "txtPname")
-    players[1].set 'Will Fill'
+    players[1].set @partner
     players[2].click
 
-    @b.alert.ok
+#    @b.alert.ok
     main_frame.img(:name => 'schedule').click
     not error?
   end
@@ -110,7 +113,7 @@ class Player
   end
 
   def can_schedule?(reservation)
-    if @num_reservations >= 2
+    if @reserved_times.size >= 2
       return false
     end
     @existing_reservations.each do |existing_reservation|
@@ -130,13 +133,15 @@ class Player
         time = m.captures[1]
         start_time = Time.parse(time)
 
-        @num_reservations += 1
+        @reserved_times.add(start_time)
         if reservation.start_time == start_time
           reserve(reservation, court)
-          Log.info @name + " already has " + court.long_name + " @ " + time
+          Log.info @name + " already has " + court.short_name + " @ " + start_time.strftime('%I:%M%p')
+          return true
         end
       end
     end
+    false
   end
 
   def login
@@ -153,8 +158,14 @@ class Player
       f.text_field(:name => 'Mtxtpwd').when_present.set @password
       f.button(:name => 'cmdSubmit').click
 
+      if @b.frame(:name => "CenterFrame").form(:name => "chPass").present?
+        @b.frame(:name => "CenterFrame").form(:name => "chPass").button(:name => 'submit1').click
+      end
+
       # Extract name
-      @name = @b.frame(:name => "header").table.table.font(:color => "white").text
+      if @name.empty?
+        @name = @b.frame(:name => "header").table.table.font(:color => "white").text
+      end
 
       # pick date
       pick_date(@date)

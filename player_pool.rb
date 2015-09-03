@@ -9,8 +9,6 @@ class PlayerPool
 
       if player.days.include?(player.date.wday)
         @players << player
-      else
-        Log.warn player.username + " does not schedule on " + player.date.strftime('%A') + "s"
       end
     end
   end
@@ -21,20 +19,13 @@ class PlayerPool
 
   def fill_reservations
     DailyReservation.reservations.each do |reservation|
-      Log.info("Finding " + reservation.to_s)
       @players.each do |player|
         if reservation.filled?
           break
         end
-        if player.can_schedule?(reservation)
-          player.reserve_court(reservation)
-        end
-      end
-
-      if reservation.filled?
-        Log.info("Filled " + reservation.to_s)
-      else
-        Log.warn("Unable to fill " + reservation.to_s)
+        player.login
+        player.reserve_court(reservation)
+        player.logout
       end
     end
   end

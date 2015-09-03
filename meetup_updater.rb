@@ -52,7 +52,7 @@ class MeetupUpdater
       find_us = how_to_find_us(courts_by_time)
       Log.info find_us
       @client.post(:event, result.event['id'], {
-          :how_to_find_us => find_us
+                             :how_to_find_us => find_us
       })
       break
     end
